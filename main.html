@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rocket Launcher</title>
+</head>
+<body>
+<img src="stream?action=stream"/>
+</body>
+
+<script>
+    var keyPressed = false;
+    var commandSocket = new WebSocket('wss://' + location.host + '/control');
+    commandSocket.onerror = function (event) {
+        console.log('websocket error, falling back to http')
+        commandSocket = new WebSocket('ws://192.168.0.159:82');
+        commandSocket.onerror = function (event) {
+            alert('Error connecting to control socket')
+        }
+    }
+
+    function sendCommand(command) {
+        console.log("sending command " + command);
+        commandSocket.send(command);
+    }
+
+    function keyListener(keyDown, event) {
+        let keyCode = event.keyCode;
+        if (keyDown) {
+            if (keyPressed) return;
+            console.log("key " + event.keyCode + " down");
+
+            switch (keyCode) {
+                case 38:
+                case 87: {
+                    keyPressed = true;
+                    sendCommand("up");
+                    break
+                }
+                case 39:
+                case 68: {
+                    keyPressed = true;
+                    sendCommand("right");
+                    break
+                }
+                case 40:
+                case 83: {
+                    keyPressed = true;
+                    sendCommand("down");
+                    break
+                }
+                case 37:
+                case 65: {
+                    keyPressed = true;
+                    sendCommand("left");
+                    break
+                }
+                case 32: {
+                    keyPressed = true;
+                    sendCommand("fire");
+                    break;
+                }
+            }
+        } else {
+            if (!keyPressed) return;
+            console.log("key " + event.keyCode + " up");
+            keyPressed = false;
+            sendCommand("stop")
+        }
+    }
+
+    document.addEventListener('keydown', (event) => keyListener(true, event));
+    document.addEventListener('keyup', (event) => keyListener(false, event));
+</script>
+
+</html>
