@@ -1,0 +1,9 @@
+[Unit]
+Description=MJPEG streamer service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/share/mjpg-streamer/streamer
+
+[Install]
+WantedBy=multi-user.target
